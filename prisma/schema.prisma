@@ -1,0 +1,187 @@
+// This is your Prisma schema file for Finara Finance Tracker
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  binaryTargets = ["native", "darwin-arm64"]
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  username  String   @unique
+  passwordHash String  @map("password_hash")
+  firstName String?   @map("first_name")
+  lastName  String?   @map("last_name")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  accounts         Account[]
+  transactions     Transaction[]
+  categories       Category[]
+  budgets          Budget[]
+  financial_goals  FinancialGoal[]
+  goalContributions GoalContribution[]
+
+  @@map("users")
+}
+
+model Account {
+  id        String   @id @default(cuid())
+  userId    String   @map("user_id")
+  name      String
+  balance   Decimal  @default(0)
+  currency  String   @default("USD")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transactions Transaction[]
+
+  @@map("accounts")
+}
+
+
+enum CategoryType {
+  income
+  expense
+}
+
+model Category {
+  id        String   @id @default(cuid())
+  userId    String
+  name      String
+  type      CategoryType
+
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transactions Transaction[]
+  budgets Budget[]
+
+  @@unique([userId, name])
+  @@map("categories")
+}
+
+model Transaction {
+  id          String   @id @default(cuid())
+  userId      String
+  accountId   String
+  categoryId  String
+
+  amount      Decimal
+  description String?
+  date        DateTime
+  notes       String?
+  receipt     String?
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  account  Account  @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  category Category @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  goalContributions GoalContribution[] 
+
+  @@index([userId, date])
+  @@map("transactions")
+}
+
+model Budget {
+  id        String   @id @default(cuid())
+  userId    String   @map("user_id")
+  categoryId String  @map("category_id")
+  amount    Decimal
+  month     Int
+  year      Int
+  spent     Decimal  @default(0)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  category Category @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+
+  @@unique([userId, categoryId, month, year])
+  @@map("budgets")
+}
+
+enum GoalCategory {
+  savings
+  investment
+  education
+  travel
+  other
+}
+
+enum GoalPriority {
+  low
+  medium
+  high
+}
+
+enum GoalStatus {
+  active
+  completed
+  abandoned
+}
+
+model FinancialGoal {
+  id            String   @id @default(cuid())
+  userId        String
+
+  name          String
+  targetAmount  Decimal
+  currentAmount Decimal  @default(0)
+
+  category      GoalCategory
+  priority      GoalPriority @default(medium)
+  status        GoalStatus   @default(active)
+
+  deadline      DateTime?
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  user          User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  contributions GoalContribution[]
+
+  @@map("financial_goals")
+}
+
+model GoalContribution {
+  id        String   @id @default(cuid())
+  userId    String
+  goalId    String
+
+  amount    Decimal
+  date      DateTime
+
+  sourceTransactionId String?
+
+  createdAt DateTime @default(now())
+
+  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  goal        FinancialGoal @relation(fields: [goalId], references: [id], onDelete: Cascade)
+  transaction Transaction?  @relation(fields: [sourceTransactionId], references: [id])
+
+  @@index([goalId])
+  @@map("goal_contributions")
+}
+
+model License {
+  id          String   @id @default(cuid())
+  email       String
+  licenseKey  String   @unique @map("license_key")
+  isActive    Boolean  @default(true) @map("is_active")
+  activatedAt DateTime? @map("activated_at")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@map("licenses")
+}
