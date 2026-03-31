@@ -5,16 +5,7 @@ import {
 } from "@/modules/licenses/license.dto";
 import LicenseRepository from "@/modules/licenses/license.repository";
 import LicenseEntity from "@/modules/licenses/license.entities";
-
-const generateLicenseKey = (): string => {
-  const chars =
-    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-  let key = "";
-  for (let i = 0; i < 32; i++) {
-    key += chars.charAt(Math.floor(Math.random() * chars.length));
-  }
-  return key;
-};
+import { generateLicenseKey } from "@/utils/generator";
 
 const LicenseService = {
   claimLicense: async (data: ClaimLicenseDTO) => {
@@ -24,24 +15,27 @@ const LicenseService = {
     }
 
     const licenseKey = generateLicenseKey();
+
     const licenseData: LicenseEntity = {
+      id: crypto.randomUUID(),
       email: data.email,
       license_key: licenseKey,
+      order_id: data.order_id,
       is_active: false,
       created_at: new Date(),
+      updated_at: new Date(),
     };
 
     const result = await LicenseRepository.insert(licenseData);
+
     return {
-      id: result.id,
-      email: result.email,
       license_key: result.license_key,
-      message: "License claimed successfully",
     };
   },
 
   activateLicense: async (data: ActivateLicenseDTO) => {
     const license = await LicenseRepository.findByEmail(data.email);
+
     if (!license) {
       throw new Error("License not found for this email");
     }
@@ -54,11 +48,12 @@ const LicenseService = {
       throw new Error("License is already activated");
     }
 
-    await LicenseRepository.update(license.id, {
+    const updatedLicense = {
+      id: license.id,
       is_active: true,
-      activated_at: new Date(),
-    });
+    };
 
+    await LicenseRepository.updateLicense(updatedLicense);
     return {
       email: license.email,
       message: "License activated successfully",

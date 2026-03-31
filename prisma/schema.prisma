@@ -178,6 +178,7 @@ model License {
   id          String   @id @default(cuid())
   email       String
   licenseKey  String   @unique @map("license_key")
+  order_id    String? 
   isActive    Boolean  @default(true) @map("is_active")
   activatedAt DateTime? @map("activated_at")
   createdAt   DateTime @default(now()) @map("created_at")

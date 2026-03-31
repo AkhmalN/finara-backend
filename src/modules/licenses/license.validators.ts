@@ -2,6 +2,7 @@ import z from "zod";
 
 export const claimLicenseSchema = z.object({
   email: z.string().email("Invalid email address"),
+  order_id: z.string().min(1, "Order ID is optional").optional(),
 });
 
 export const activateLicenseSchema = z.object({

@@ -27,7 +27,7 @@ const AuthService = {
     const user = await AuthRepository.findPasswordByEmail(email);
 
     if (!user) {
-      throw new Error("User not found");
+      throw new Error("Akun tidak ditemukan");
     }
 
     const isPasswordValid = await comparePassword(password, user.password_hash);

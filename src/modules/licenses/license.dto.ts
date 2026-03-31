@@ -1,5 +1,6 @@
 export type ClaimLicenseDTO = {
   email: string;
+  order_id: string;
 };
 
 export type ActivateLicenseDTO = {

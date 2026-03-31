@@ -4,13 +4,13 @@ import { StatusCodes } from "http-status-codes";
 
 const LicenseController = {
   claimLicense: async (req: Request, res: Response) => {
-    const { email } = req.body;
+    const { email, order_id } = req.body;
 
     try {
-      const license = await LicenseService.claimLicense({ email });
+      const license = await LicenseService.claimLicense({ email, order_id });
       res.status(StatusCodes.CREATED).json({
         success: true,
-        message: license.message,
+        message: "License claimed successfully",
         data: license,
       });
     } catch (error) {
@@ -44,42 +44,42 @@ const LicenseController = {
     }
   },
 
-  getLicenses: async (req: Request, res: Response) => {
-    const query = req.query;
-    try {
-      const licenses = await LicenseService.getLicenses(query);
-      res.status(StatusCodes.OK).json({
-        success: true,
-        message: "Licenses retrieved successfully",
-        data: licenses.data,
-        meta: licenses.meta,
-      });
-    } catch (error) {
-      res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-        success: false,
-        message: "Failed to retrieve licenses",
-        error: error instanceof Error ? error.message : "Unknown error",
-      });
-    }
-  },
+  // getLicenses: async (req: Request, res: Response) => {
+  //   const query = req.query;
+  //   try {
+  //     const licenses = await LicenseService.getLicenses(query);
+  //     res.status(StatusCodes.OK).json({
+  //       success: true,
+  //       message: "Licenses retrieved successfully",
+  //       data: licenses.data,
+  //       meta: licenses.meta,
+  //     });
+  //   } catch (error) {
+  //     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+  //       success: false,
+  //       message: "Failed to retrieve licenses",
+  //       error: error instanceof Error ? error.message : "Unknown error",
+  //     });
+  //   }
+  // },
 
-  deleteLicense: async (req: Request, res: Response) => {
-    const licenseId = req.params.id;
+  // deleteLicense: async (req: Request, res: Response) => {
+  //   const licenseId = req.params.id;
 
-    try {
-      await LicenseService.deleteLicense(licenseId as string);
-      res.status(StatusCodes.OK).json({
-        success: true,
-        message: "License deleted successfully",
-      });
-    } catch (error) {
-      res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-        success: false,
-        message: "Failed to delete license",
-        error: error instanceof Error ? error.message : "Unknown error",
-      });
-    }
-  },
+  //   try {
+  //     await LicenseService.deleteLicense(licenseId as string);
+  //     res.status(StatusCodes.OK).json({
+  //       success: true,
+  //       message: "License deleted successfully",
+  //     });
+  //   } catch (error) {
+  //     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+  //       success: false,
+  //       message: "Failed to delete license",
+  //       error: error instanceof Error ? error.message : "Unknown error",
+  //     });
+  //   }
+  // },
 };
 
 export default LicenseController;

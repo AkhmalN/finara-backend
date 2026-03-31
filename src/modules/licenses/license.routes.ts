@@ -21,12 +21,12 @@ router.post(
   LicenseController.activateLicense,
 );
 
-router.get(
-  "/",
-  validateData(licensesQuerySchema),
-  LicenseController.getLicenses,
-);
+// router.get(
+//   "/",
+//   validateData(licensesQuerySchema),
+//   LicenseController.getLicenses,
+// );
 
-router.delete("/delete/:id", LicenseController.deleteLicense);
+// router.delete("/delete/:id", LicenseController.deleteLicense);
 
 export default router;
