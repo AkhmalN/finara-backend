@@ -10,23 +10,22 @@ datasource db {
   provider = "postgresql"
 }
 
-
 model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  username  String   @unique
-  passwordHash String  @map("password_hash")
-  firstName String?   @map("first_name")
-  lastName  String?   @map("last_name")
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
+  id           String   @id @default(cuid())
+  email        String   @unique
+  username     String   @unique
+  passwordHash String   @map("password_hash")
+  firstName    String?  @map("first_name")
+  lastName     String?  @map("last_name")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
 
   // Relations
-  accounts         Account[]
-  transactions     Transaction[]
-  categories       Category[]
-  budgets          Budget[]
-  financial_goals  FinancialGoal[]
+  accounts          Account[]
+  transactions      Transaction[]
+  categories        Category[]
+  budgets           Budget[]
+  financial_goals   FinancialGoal[]
   goalContributions GoalContribution[]
 
   @@map("users")
@@ -48,31 +47,30 @@ model Account {
   @@map("accounts")
 }
 
-
 enum CategoryType {
   income
   expense
 }
 
 model Category {
-  id        String   @id @default(cuid())
-  userId    String
-  name      String
-  type      CategoryType
+  id     String       @id @default(cuid())
+  userId String       @map("user_id")
+  name   String
+  type   CategoryType
 
-  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user         User           @relation(fields: [userId], references: [id], onDelete: Cascade)
   transactions Transaction[]
-  budgets Budget[]
+  budgets      Budget[]
 
   @@unique([userId, name])
   @@map("categories")
 }
 
 model Transaction {
-  id          String   @id @default(cuid())
-  userId      String
-  accountId   String
-  categoryId  String
+  id         String @id @default(cuid())
+  userId     String @map("user_id")
+  accountId  String @map("account_id")
+  categoryId String @map("category_id")
 
   amount      Decimal
   description String?
@@ -80,12 +78,12 @@ model Transaction {
   notes       String?
   receipt     String?
 
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
-  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  account  Account  @relation(fields: [accountId], references: [id], onDelete: Cascade)
-  category Category @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  user              User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  account           Account            @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  category          Category           @relation(fields: [categoryId], references: [id], onDelete: Restrict)
   goalContributions GoalContribution[] 
 
   @@index([userId, date])
@@ -93,15 +91,15 @@ model Transaction {
 }
 
 model Budget {
-  id        String   @id @default(cuid())
-  userId    String   @map("user_id")
-  categoryId String  @map("category_id")
-  amount    Decimal
-  month     Int
-  year      Int
-  spent     Decimal  @default(0)
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
+  id         String   @id @default(cuid())
+  userId     String   @map("user_id")
+  categoryId String   @map("category_id")
+  amount     Decimal
+  month      Int
+  year       Int
+  spent      Decimal  @default(0)
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
 
   // Relations
   user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -133,11 +131,11 @@ enum GoalStatus {
 
 model FinancialGoal {
   id            String   @id @default(cuid())
-  userId        String
+  userId        String   @map("user_id")
 
   name          String
-  targetAmount  Decimal
-  currentAmount Decimal  @default(0)
+  targetAmount  Decimal  @map("target_amount")
+  currentAmount Decimal  @default(0) @map("current_amount")
 
   category      GoalCategory
   priority      GoalPriority @default(medium)
@@ -145,8 +143,8 @@ model FinancialGoal {
 
   deadline      DateTime?
 
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
 
   user          User @relation(fields: [userId], references: [id], onDelete: Cascade)
   contributions GoalContribution[]
@@ -155,16 +153,16 @@ model FinancialGoal {
 }
 
 model GoalContribution {
-  id        String   @id @default(cuid())
-  userId    String
-  goalId    String
+  id     String @id @default(cuid())
+  userId String @map("user_id")
+  goalId String @map("goal_id")
 
   amount    Decimal
   date      DateTime
 
-  sourceTransactionId String?
+  sourceTransactionId String? @map("source_transaction_id")
 
-  createdAt DateTime @default(now())
+  createdAt DateTime @default(now()) @map("created_at")
 
   user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   goal        FinancialGoal @relation(fields: [goalId], references: [id], onDelete: Cascade)
@@ -175,14 +173,14 @@ model GoalContribution {
 }
 
 model License {
-  id          String   @id @default(cuid())
+  id          String    @id @default(cuid())
   email       String
-  licenseKey  String   @unique @map("license_key")
-  order_id    String? 
-  isActive    Boolean  @default(true) @map("is_active")
+  licenseKey  String    @unique @map("license_key")
+  orderId     String?   @map("order_id")
+  isActive    Boolean   @default(true) @map("is_active")
   activatedAt DateTime? @map("activated_at")
-  createdAt   DateTime @default(now()) @map("created_at")
-  updatedAt   DateTime @updatedAt @map("updated_at")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
 
   @@map("licenses")
 }

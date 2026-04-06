@@ -1,26 +1,46 @@
-import { Request, Response, NextFunction } from 'express';
-import { z, ZodError } from 'zod';
+import { Request, Response, NextFunction } from "express";
+import { z, ZodError, type ZodIssue } from "zod";
+import { StatusCodes } from "http-status-codes";
 
-import { StatusCodes } from 'http-status-codes';
+type ValidationErrorItem = {
+  field: string;
+  message: string;
+  code: string;
+};
 
-export function validateData(schema: z.ZodObject<any, any>) {
+const formatZodIssues = (issues: ZodIssue[]): ValidationErrorItem[] => {
+  return issues.map((issue) => ({
+    field: issue.path.length > 0 ? issue.path.join(".") : "body",
+    message: issue.message,
+    code: issue.code,
+  }));
+};
+
+export function validateData(schema: z.ZodTypeAny) {
   return (req: Request, res: Response, next: NextFunction) => {
     try {
       schema.parse(req.body);
       next();
     } catch (error) {
       if (error instanceof ZodError) {
-        const errorMessages = error.issues.map((issue: any) => ({
-          message: `${issue.path.join('.')} is ${issue.message}`,
-        }));
-        res
-          .status(StatusCodes.BAD_REQUEST)
-          .json({ error: 'Invalid data', details: errorMessages });
-      } else {
-        res
-          .status(StatusCodes.INTERNAL_SERVER_ERROR)
-          .json({ error: 'Internal Server Error' });
+        const errors = formatZodIssues(error.issues);
+        const isMissingBody = error.issues.some(
+          (issue) => issue.path.length === 0 && issue.code === "invalid_type",
+        );
+
+        return res.status(StatusCodes.BAD_REQUEST).json({
+          success: false,
+          message: isMissingBody
+            ? "Request body is required"
+            : "Validation failed",
+          errors,
+        });
       }
+
+      return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+        success: false,
+        message: "Internal Server Error",
+      });
     }
   };
 }

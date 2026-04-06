@@ -9,6 +9,7 @@ dotenv.config();
 import authRoutes from "./modules/auth/auth.routes";
 import userRoutes from "./modules/users/user.routes";
 import licenseRoutes from "./modules/licenses/license.routes";
+import categoryRoutes from "./modules/categories/category.routes";
 
 const app = express();
 
@@ -45,6 +46,7 @@ if (process.env.NODE_ENV === "development") {
 app.use("/api/auth", authRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api/licenses", licenseRoutes);
+app.use("/api/categories", categoryRoutes);
 
 app.get("/health", async (req, res) => {
   res.json({ status: "OK", message: "Checking api health" });

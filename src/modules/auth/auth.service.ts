@@ -37,7 +37,6 @@ const AuthService = {
     }
 
     const token = signToken({ userId: user.id, email: user.email });
-
     return {
       access_token: token,
       user: {
