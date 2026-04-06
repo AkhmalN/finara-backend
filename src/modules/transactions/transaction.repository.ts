@@ -119,74 +119,61 @@ const TransactionRepository = {
   },
 
   update: async (id: string, data: Partial<TransactionEntity>) => {
-    const updates: string[] = [];
-    const values: any[] = [];
-    let paramIndex = 1;
-
-    if (data.user_id !== undefined) {
-      updates.push(`user_id = $${paramIndex}`);
-      values.push(data.user_id);
-      paramIndex++;
-    }
-
-    if (data.account_id !== undefined) {
-      updates.push(`account_id = $${paramIndex}`);
-      values.push(data.account_id);
-      paramIndex++;
-    }
-
-    if (data.category_id !== undefined) {
-      updates.push(`category_id = $${paramIndex}`);
-      values.push(data.category_id);
-      paramIndex++;
-    }
-
-    if (data.amount !== undefined) {
-      updates.push(`amount = $${paramIndex}`);
-      values.push(data.amount);
-      paramIndex++;
-    }
-
-    if (data.description !== undefined) {
-      updates.push(`description = $${paramIndex}`);
-      values.push(data.description || null);
-      paramIndex++;
-    }
-
-    if (data.date !== undefined) {
-      updates.push(`date = $${paramIndex}`);
-      values.push(data.date);
-      paramIndex++;
-    }
-
-    if (data.notes !== undefined) {
-      updates.push(`notes = $${paramIndex}`);
-      values.push(data.notes || null);
-      paramIndex++;
-    }
-
-    if (data.receipt !== undefined) {
-      updates.push(`receipt = $${paramIndex}`);
-      values.push(data.receipt || null);
-      paramIndex++;
-    }
-
-    updates.push(`updated_at = $${paramIndex}`);
-    values.push(new Date());
-    paramIndex++;
-
-    if (updates.length === 0) {
-      return findById(id);
-    }
-
-    values.push(id);
-
-    const { rows } = await db.query(
-      `UPDATE transactions SET ${updates.join(", ")} WHERE id = $${paramIndex} RETURNING *`,
-      values,
-    );
-
-    return rows[0];
+    // const updates: string[] = [];
+    // const values: any[] = [];
+    // let paramIndex = 1;
+    // if (data.user_id !== undefined) {
+    //   updates.push(`user_id = $${paramIndex}`);
+    //   values.push(data.user_id);
+    //   paramIndex++;
+    // }
+    // if (data.account_id !== undefined) {
+    //   updates.push(`account_id = $${paramIndex}`);
+    //   values.push(data.account_id);
+    //   paramIndex++;
+    // }
+    // if (data.category_id !== undefined) {
+    //   updates.push(`category_id = $${paramIndex}`);
+    //   values.push(data.category_id);
+    //   paramIndex++;
+    // }
+    // if (data.amount !== undefined) {
+    //   updates.push(`amount = $${paramIndex}`);
+    //   values.push(data.amount);
+    //   paramIndex++;
+    // }
+    // if (data.description !== undefined) {
+    //   updates.push(`description = $${paramIndex}`);
+    //   values.push(data.description || null);
+    //   paramIndex++;
+    // }
+    // if (data.date !== undefined) {
+    //   updates.push(`date = $${paramIndex}`);
+    //   values.push(data.date);
+    //   paramIndex++;
+    // }
+    // if (data.notes !== undefined) {
+    //   updates.push(`notes = $${paramIndex}`);
+    //   values.push(data.notes || null);
+    //   paramIndex++;
+    // }
+    // if (data.receipt !== undefined) {
+    //   updates.push(`receipt = $${paramIndex}`);
+    //   values.push(data.receipt || null);
+    //   paramIndex++;
+    // }
+    // updates.push(`updated_at = $${paramIndex}`);
+    // values.push(new Date());
+    // paramIndex++;
+    // if (updates.length === 0) {
+    //   return findById(id);
+    // }
+    // values.push(id);
+    // const { rows } = await db.query(
+    //   `UPDATE transactions SET ${updates.join(", ")} WHERE id = $${paramIndex} RETURNING *`,
+    //   values,
+    // );
+    // return rows[0];
   },
 
   delete: async (id: string) => {
@@ -199,6 +186,3 @@ const TransactionRepository = {
 };
 
 export default TransactionRepository;
-function findById(id: string) {
-  throw new Error("Function not implemented.");
-}
