@@ -10,6 +10,9 @@ import authRoutes from "./modules/auth/auth.routes";
 import userRoutes from "./modules/users/user.routes";
 import licenseRoutes from "./modules/licenses/license.routes";
 import categoryRoutes from "./modules/categories/category.routes";
+import transactionRoutes from "./modules/transactions/transaction.routes";
+import budgetRoutes from "./modules/budgets/budget.routes";
+import goalRoutes from "./modules/goals/goal.routes";
 
 const app = express();
 
@@ -47,6 +50,9 @@ app.use("/api/auth", authRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api/licenses", licenseRoutes);
 app.use("/api/categories", categoryRoutes);
+app.use("/api/transactions", transactionRoutes);
+app.use("/api/budgets", budgetRoutes);
+app.use("/api/goals", goalRoutes);
 
 app.get("/health", async (req, res) => {
   res.json({ status: "OK", message: "Checking api health" });

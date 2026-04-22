@@ -1,0 +1,20 @@
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const auth_middleware_1 = require("@/middlewares/auth.middleware");
+const validation_middleware_1 = require("@/middlewares/validation.middleware");
+const goal_controller_1 = __importDefault(require("@/modules/goals/goal.controller"));
+const goal_validators_1 = require("@/modules/goals/goal.validators");
+const router = (0, express_1.Router)();
+router.use(auth_middleware_1.authMiddleware);
+router.get("/", (0, validation_middleware_1.validateQuery)(goal_validators_1.goalsQuerySchema), goal_controller_1.default.getGoals);
+router.get("/:id", goal_controller_1.default.getGoalById);
+router.post("/", (0, validation_middleware_1.validateData)(goal_validators_1.createGoalSchema), goal_controller_1.default.createGoal);
+router.patch("/:id", (0, validation_middleware_1.validateData)(goal_validators_1.updateGoalSchema), goal_controller_1.default.updateGoal);
+router.delete("/:id", goal_controller_1.default.deleteGoal);
+router.get("/:id/contributions", goal_controller_1.default.getGoalContributions);
+router.post("/:id/contributions", (0, validation_middleware_1.validateData)(goal_validators_1.createGoalContributionSchema), goal_controller_1.default.addGoalContribution);
+exports.default = router;

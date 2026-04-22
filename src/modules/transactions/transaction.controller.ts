@@ -1,11 +1,15 @@
 import { Request, Response } from "express";
 import TransactionService from "@/modules/transactions/transaction.service";
 import { StatusCodes } from "http-status-codes";
+import { AuthRequest } from "@/middlewares/auth.middleware";
 
 const TransactionController = {
-  createTransaction: async (req: Request, res: Response) => {
+  createTransaction: async (req: AuthRequest, res: Response) => {
     try {
-      const transaction = await TransactionService.createTransaction(req.body);
+      const transaction = await TransactionService.createTransaction(
+        req.body,
+        req.user.userId,
+      );
       res.status(StatusCodes.CREATED).json({
         success: true,
         message: "Transaction created successfully",

@@ -19,7 +19,8 @@ const formatZodIssues = (issues: ZodIssue[]): ValidationErrorItem[] => {
 export function validateData(schema: z.ZodTypeAny) {
   return (req: Request, res: Response, next: NextFunction) => {
     try {
-      schema.parse(req.body);
+      const parsedData = schema.parse(req.body);
+      req.body = parsedData;
       next();
     } catch (error) {
       if (error instanceof ZodError) {
@@ -33,6 +34,31 @@ export function validateData(schema: z.ZodTypeAny) {
           message: isMissingBody
             ? "Request body is required"
             : "Validation failed",
+          errors,
+        });
+      }
+
+      return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+        success: false,
+        message: "Internal Server Error",
+      });
+    }
+  };
+}
+
+export function validateQuery(schema: z.ZodTypeAny) {
+  return (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const parsedQuery = schema.parse(req.query);
+      (req as any).query = parsedQuery;
+      next();
+    } catch (error) {
+      if (error instanceof ZodError) {
+        const errors = formatZodIssues(error.issues);
+
+        return res.status(StatusCodes.BAD_REQUEST).json({
+          success: false,
+          message: "Validation failed",
           errors,
         });
       }

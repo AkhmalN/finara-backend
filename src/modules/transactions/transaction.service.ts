@@ -7,10 +7,10 @@ import TransactionRepository from "@/modules/transactions/transaction.repository
 import TransactionEntity from "@/modules/transactions/transaction.entities";
 
 const TransactionService = {
-  createTransaction: async (data: CreateTransactionDTO) => {
+  createTransaction: async (data: CreateTransactionDTO, user_id: string) => {
     const transactionData: TransactionEntity = {
       id: crypto.randomUUID(),
-      user_id: data.user_id,
+      user_id: user_id,
       account_id: data.account_id,
       category_id: data.category_id,
       amount: data.amount,
@@ -74,8 +74,6 @@ const TransactionService = {
     }
 
     const updateData: Partial<TransactionEntity> = {
-      user_id: data.user_id,
-      account_id: data.account_id,
       category_id: data.category_id,
       amount: data.amount,
       description: data.description,
